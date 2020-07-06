@@ -2,7 +2,6 @@ package domains
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"time"
 )
@@ -56,16 +55,14 @@ func UpdateProduct(id int, p *Product) error {
 	return nil
 }
 
-var ErrProductNotFound = fmt.Errorf("Product not found")
-
 func FindProduct(id int) (*Product, int, error) {
-	for _, p := range productList {
+	for pos, p := range productList {
 		if p.ID == id {
-			return p, id, nil
+			return p, pos, nil
 		}
 	}
 
-	return nil, -1, ErrProductNotFound
+	return nil, -1, ErrNotFound
 }
 
 var productList = Products{

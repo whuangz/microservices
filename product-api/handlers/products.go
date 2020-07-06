@@ -3,97 +3,103 @@ package handlers
 import (
 	"log"
 	"net/http"
-	"regexp"
 	"strconv"
 
-	"github.com/whuangz/product-api/domains"
+	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
+	"github.com/whuangz/microservices/product-api/domains"
 )
 
 type Products struct {
 	l *log.Logger
 }
 
-func NewProducs(l *log.Logger) *Products {
-	return &Products{l}
+func NewProdutcs(e *echo.Echo, l *log.Logger) {
+	p := &Products{l}
+	e.GET("/products", p.getProducts)
+	e.GET("/products/:id", p.getProductDetail)
+	e.POST("/products", p.addProduct)
+	e.PUT("/products/:id", p.updateProduct)
+	e.Use(p.middlewareProductValidation)
 }
 
-func (p *Products) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		p.getProducts(w, req)
-		return
-	}
-
-	if req.Method == http.MethodPost {
-		p.addProduct(w, req)
-		return
-	}
-
-	if req.Method == http.MethodPut {
-		reg := regexp.MustCompile(`/([0-9]+)`)
-		g := reg.FindAllStringSubmatch(req.URL.Path, -1)
-
-		if len(g) != 1 {
-			http.Error(w, "Invalid URI", http.StatusBadRequest)
-			return
-		}
-
-		if len(g[0]) != 1 {
-			http.Error(w, "Invalid URI", http.StatusBadRequest)
-			return
-		}
-
-		idString := g[0][1]
-		id, err := strconv.Atoi(idString)
-		if err != nil {
-			http.Error(w, "Invalid URI", http.StatusBadRequest)
-			return
-		}
-
-		p.addProduct(id, w, req)
-
-		return
-	}
-
-	w.WriteHeader(http.StatusMethodNotAllowed)
-}
-
-func (p *Products) getProducts(w http.ResponseWriter, req *http.Request) {
+func (p *Products) getProducts(c echo.Context) error {
 	lp := domains.GetProducts()
-	err := lp.ToJSON(w)
+	return c.JSON(http.StatusOK, lp)
+}
+
+func (p *Products) getProductDetail(c echo.Context) error {
+	idP, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
+		return c.JSON(http.StatusNotFound, domains.ErrNotFound.Error())
+	}
+
+	product, _, err := domains.FindProduct(idP)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusOK, product)
+}
+
+func (p *Products) addProduct(c echo.Context) (err error) {
+
+	prod := c.Get("keyProduct").(domains.Product)
+	domains.AddProduct(&prod)
+
+	return c.JSON(http.StatusCreated, prod)
+}
+
+func (p *Products) updateProduct(c echo.Context) error {
+	idP, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, domains.ErrNotFound.Error())
+	}
+
+	prod := c.Get("keyProduct").(domains.Product)
+
+	err = domains.UpdateProduct(idP, &prod)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, domains.ErrNotFound.Error())
+	}
+
+	return c.JSON(http.StatusCreated, prod)
+}
+
+func (p *Products) middlewareProductValidation(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var prod domains.Product
+		err := c.Bind(&prod)
+
+		if err != nil {
+			return c.JSON(http.StatusUnprocessableEntity, err.Error())
+		}
+
+		c.Set("keyProduct", prod)
+		return next(c)
 	}
 }
 
-func (p *Products) addProduct(w http.ResponseWriter, req *http.Request) {
+// Move to Helpers
 
-	prod := &domains.Product{}
-	err := prod.FromJSON(req.Body)
-
-	if err != nil {
-		http.Error(w, "Unable to marshal json", http.StatusBadRequest)
-	}
-
-	domains.AddProduct(prod)
+type ResponseError struct {
+	Message string `json:"message"`
 }
 
-func (p *Products) updateProduct(id int, w http.ResponseWriter, req *http.Request) {
-
-	prod := &domains.Product{}
-	err := prod.FromJSON(req.Body)
-
-	if err != nil {
-		http.Error(w, "Unable to marshal json", http.StatusBadRequest)
+func getStatusCode(err error) int {
+	if err == nil {
+		return http.StatusOK
 	}
 
-	err := domains.UpdateProduct(id, prod)
-	if err == domains.ErrProductNotFound {
-		http.Error(w, "Product Not Found", http.StatusBadRequest)
-		return
-	}
-
-	if err != nil {
-		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
-		return
+	logrus.Error(err)
+	switch err {
+	case domains.ErrInternalServerError:
+		return http.StatusInternalServerError
+	case domains.ErrNotFound:
+		return http.StatusNotFound
+	case domains.ErrConflict:
+		return http.StatusConflict
+	default:
+		return http.StatusInternalServerError
 	}
 }

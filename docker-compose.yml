@@ -1,0 +1,13 @@
+version: "3.4"
+services:
+  product-api:
+      container_name: product_api 
+      image: whuangz/product-api:latest
+      build: 
+        context: product-api
+        target: dev
+        dockerfile: Dockerfile
+      ports:
+        - 8080:8080
+      volumes:
+        - ./product-api:/product-api
