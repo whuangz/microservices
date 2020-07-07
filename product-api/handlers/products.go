@@ -75,6 +75,12 @@ func (p *Products) middlewareProductValidation(next echo.HandlerFunc) echo.Handl
 			return c.JSON(http.StatusUnprocessableEntity, err.Error())
 		}
 
+		//validation
+		err = prod.Validate()
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+
 		c.Set("keyProduct", prod)
 		return next(c)
 	}
