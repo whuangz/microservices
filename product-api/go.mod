@@ -13,11 +13,9 @@ require (
 	github.com/spf13/viper v1.7.0
 	github.com/swaggo/echo-swagger v1.0.0
 	github.com/swaggo/swag v1.6.7
-	github.com/whuangz/microservices/helpers v0.0.0-00010101000000-000000000000
+	github.com/whuangz/microservices/helpers v0.0.0-20200709140317-ed141739a3fc
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20200706234117-b22de6825cf7 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
-
-replace github.com/whuangz/microservices/helpers => ../helpers
