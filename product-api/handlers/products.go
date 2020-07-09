@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/whuangz/microservices/product-api/domains"
 )
@@ -14,13 +14,8 @@ type Products struct {
 	l *log.Logger
 }
 
-func NewProdutcs(e *echo.Echo, l *log.Logger) {
-	p := &Products{l}
-	e.GET("/products", p.getProducts)
-	e.GET("/products/:id", p.getProductDetail)
-	e.POST("/products", p.addProduct)
-	e.PUT("/products/:id", p.updateProduct)
-	e.Use(p.middlewareProductValidation)
+func NewProducts(l *log.Logger) *Products {
+	return &Products{l}
 }
 
 func (p *Products) getProducts(c echo.Context) error {

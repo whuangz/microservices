@@ -1,0 +1,14 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact:
+    email: n.hua.drt@gmail.com
+    name: Product API Support
+  description: This is Product list API.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Products API
+  version: "1.0"
+paths: {}
+swagger: "2.0"

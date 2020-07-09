@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 )
 
 type Product struct {
@@ -21,6 +21,7 @@ type Product struct {
 func (p *Product) Validate() error {
 	validate := validator.New()
 	validate.RegisterValidation("sku", validateSKU)
+
 	return validate.Struct(p)
 }
 
@@ -77,7 +78,7 @@ var productList = Products{
 		Name:        "Adidas Yeezy 360",
 		Description: "Used by Me",
 		Price:       3600000,
-		SKU:         "ME23",
+		SKU:         "adb-dse-fsd",
 		CreatedAt:   time.Now().UTC().String(),
 		UpdatedAt:   time.Now().UTC().String(),
 	},
@@ -86,7 +87,7 @@ var productList = Products{
 		Name:        "Adidas Yeezy 720",
 		Description: "Used by Me",
 		Price:       7600000,
-		SKU:         "ME24",
+		SKU:         "adb-dse-fsd",
 		CreatedAt:   time.Now().UTC().String(),
 		UpdatedAt:   time.Now().UTC().String(),
 	},

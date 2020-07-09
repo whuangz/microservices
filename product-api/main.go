@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/whuangz/microservices/product-api/handlers"
 )
 
@@ -16,7 +16,7 @@ func main() {
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
 
 	e := echo.New()
-	handlers.NewProdutcs(e, l)
+	handlers.Router(e, l)
 
 	s := &http.Server{
 		Addr:         ":8080",
