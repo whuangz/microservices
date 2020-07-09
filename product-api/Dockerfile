@@ -2,8 +2,7 @@ FROM golang:1.14 as dev
 WORKDIR /product-api
 ENV GO111MODULE=on 
 RUN go get github.com/cortesi/modd/cmd/modd
-COPY go.mod go.sum ./
-RUN go mod download
+
 COPY . .
 CMD modd
 
