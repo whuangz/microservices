@@ -9,7 +9,7 @@ import (
 	_ "github.com/whuangz/microservices/product-api/docs"
 
 	"github.com/labstack/echo/v4"
-	mysql "github.com/whuangz/microservices/engine-helper/database"
+	mysql "github.com/whuangz/microservices/helpers/database"
 
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
