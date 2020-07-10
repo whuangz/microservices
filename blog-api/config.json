@@ -1,0 +1,13 @@
+{
+    "debug": true,
+    "context": {
+        "timeout": 2
+    },
+    "database": {
+        "host": "db",
+        "port": "3306",
+        "user": "notSuperUser",
+        "pass": "123456",
+        "name": "articles"
+    }
+}
