@@ -25,7 +25,7 @@ func (au *ArticleUseCase) GetArticles(c echo.Context) ([]*domains.Article, error
 
 func (au *ArticleUseCase) CreateArticle(c echo.Context, da *domains.Article) (err error) {
 
-	err = au.articleRepo.InsertArticle(c, da)
+	//err = au.articleRepo.InsertArticle(c, da)
 	err = au.authorRepo.CreateAuthor(c)
 
 	return err

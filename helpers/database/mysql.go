@@ -1,26 +1,26 @@
 package mysql
 
 import (
+	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gocraft/dbr/v2"
 	"github.com/labstack/echo/v4"
 
 	"github.com/sirupsen/logrus"
 )
 
-func Init(dataSource string) *dbr.Session {
+func Init(dataSource string) *sql.DB {
 	client := Connect(dataSource)
 	return client
 }
 
-func Connect(dataSource string) *dbr.Session {
-	conn, err := dbr.Open("mysql", dataSource, nil)
+func Connect(dataSource string) *sql.DB {
+	conn, err := sql.Open("mysql", dataSource)
 
 	if err != nil {
 		logrus.Error(err)
 	} else {
-		session := conn.NewSession(nil)
-		return session
+		return conn
 	}
 	return nil
 }
@@ -28,7 +28,7 @@ func Connect(dataSource string) *dbr.Session {
 // Transactional
 const TxKey = "Tx"
 
-func TransactionHandler(db *dbr.Session) echo.MiddlewareFunc {
+func TransactionHandler(db *sql.DB) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			tx, _ := db.Begin()

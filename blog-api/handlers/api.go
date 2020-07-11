@@ -41,21 +41,24 @@ func Router(e *echo.Echo, l *log.Logger) {
 
 	dbConn := mysql.Init(databaseConnection())
 
+	//Global Middlewares
+	cors := middlewares.InitMiddleware()
+	txMiddleware := mysql.TransactionHandler(dbConn)
+	e.Use(cors.CORS)
+
 	//Repo Definition
 	articleRepo := repository.NewArticleRepo()
 	authorRepo := repository.NewAuthorRepo()
 
 	//Usecase Definition
 	au := usecase.NewArticleUseCase(articleRepo, authorRepo)
+
 	//Article Handler
 	article := NewArticles(l, au)
 	v1 := e.Group("/api/v1")
 	{
-		v1.GET("/articles", article.FetchArticles, mysql.TransactionHandler(dbConn))
-		v1.POST("/articles", article.CreateArticle, mysql.TransactionHandler(dbConn))
+		v1.GET("/articles", article.FetchArticles, txMiddleware)
+		v1.POST("/articles", article.CreateArticle, txMiddleware)
 	}
 
-	//Global Middlewares
-	cors := middlewares.InitMiddleware()
-	e.Use(cors.CORS)
 }
