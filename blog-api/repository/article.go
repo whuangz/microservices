@@ -7,10 +7,14 @@ import (
 	"github.com/whuangz/microservices/blog-api/domains"
 )
 
-type Article struct {
+type ArticleRepo struct {
 }
 
-func (a *Article) GetArticles(c echo.Context) ([]*domains.Article, error) {
+func NewArticleRepo() *ArticleRepo {
+	return &ArticleRepo{}
+}
+
+func (a *ArticleRepo) GetArticles(c echo.Context) ([]*domains.Article, error) {
 	tx := c.Get("Tx").(*dbr.Tx)
 
 	articles := make([]*domains.Article, 0)
@@ -25,29 +29,9 @@ func (a *Article) GetArticles(c echo.Context) ([]*domains.Article, error) {
 	return articles, nil
 }
 
-func (a *Article) CreateArticle(c echo.Context, da *domains.Article) (err error) {
+func (a *ArticleRepo) InsertArticle(c echo.Context, da *domains.Article) (err error) {
 	tx := c.Get("Tx").(*dbr.Tx)
 
-	err = InsertArticle(tx, da)
-	err = CreateAuthor(tx)
-
-	return err
-}
-
-func CreateAuthor(tx *dbr.Tx) error {
-
-	builder := tx.InsertBySql("INSERT author SET name=?", "Not Super User")
-	_, err := builder.Exec()
-
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	return nil
-}
-
-func InsertArticle(tx *dbr.Tx, da *domains.Article) (err error) {
 	builder := tx.InsertBySql("INSERT  article SET title=? , content=?", da.Title, da.Content)
 	_, err = builder.Exec()
 

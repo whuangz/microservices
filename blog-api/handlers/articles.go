@@ -4,22 +4,23 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/whuangz/microservices/blog-api/usecase"
+
 	"github.com/labstack/echo/v4"
 	"github.com/whuangz/microservices/blog-api/domains"
-	"github.com/whuangz/microservices/blog-api/repository"
 )
 
 type Articles struct {
-	l    *log.Logger
-	repo *repository.Article
+	l       *log.Logger
+	usecase *usecase.ArticleUseCase
 }
 
-func NewArticles(l *log.Logger) *Articles {
-	return &Articles{l, &repository.Article{}}
+func NewArticles(l *log.Logger, au *usecase.ArticleUseCase) *Articles {
+	return &Articles{l, au}
 }
 
 func (a *Articles) FetchArticles(c echo.Context) error {
-	articles, err := a.repo.GetArticles(c)
+	articles, err := a.usecase.GetArticles(c)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, "Not Found")
 	}
@@ -37,7 +38,7 @@ func (a *Articles) CreateArticle(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	err = a.repo.CreateArticle(c, &article)
+	err = a.usecase.CreateArticle(c, &article)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
