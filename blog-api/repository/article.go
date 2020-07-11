@@ -54,16 +54,16 @@ func (a *ArticleRepo) GetArticles(c echo.Context) ([]*domains.Article, error) {
 	return articles, nil
 }
 
-// func (a *ArticleRepo) InsertArticle(c echo.Context, da *domains.Article) (err error) {
-// 	tx := c.Get("Tx").(*dbr.Tx)
+func (a *ArticleRepo) InsertArticle(c echo.Context, da *domains.Article) (err error) {
+	tx := c.Get("Tx").(*sql.Tx)
 
-// 	builder := tx.InsertBySql("INSERT  article SET title=? , content=?", da.Title, da.Content)
-// 	_, err = builder.Exec()
+	rawQuery := "INSERT article SET title=? , content=?, author_id=?"
+	_, err = tx.Exec(rawQuery, da.Title, da.Content, 1)
 
-// 	if err != nil {
-// 		tx.Rollback()
-// 		return err
-// 	}
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
-// 	return nil
-// }
+	return nil
+}

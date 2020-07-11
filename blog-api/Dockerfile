@@ -2,6 +2,7 @@ FROM golang:1.14 as dev
 WORKDIR /blog-api
 ENV GO111MODULE=on 
 RUN go get github.com/cortesi/modd/cmd/modd
+RUN go get -v github.com/rubenv/sql-migrate/...
 COPY go.mod .
 COPY go.sum .
 COPY . .

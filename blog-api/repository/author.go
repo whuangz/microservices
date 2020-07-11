@@ -1,7 +1,8 @@
 package repository
 
 import (
-	"github.com/gocraft/dbr/v2"
+	"database/sql"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -12,10 +13,11 @@ func NewAuthorRepo() *AuthorRepo {
 }
 
 func (a *AuthorRepo) CreateAuthor(c echo.Context) error {
-	tx := c.Get("Tx").(*dbr.Tx)
 
-	builder := tx.InsertBySql("INSERT author SET name=?", "Not Super User")
-	_, err := builder.Exec()
+	tx := c.Get("Tx").(*sql.Tx)
+
+	rawQuery := "INSERT author SET name=?"
+	_, err := tx.Exec(rawQuery, "Not Super User")
 
 	if err != nil {
 		tx.Rollback()

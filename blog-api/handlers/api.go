@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/labstack/echo/v4"
-	mysql "github.com/whuangz/microservices/helpers/database"
+	db "github.com/whuangz/microservices/helpers/database"
 	"github.com/whuangz/microservices/helpers/middlewares"
 )
 
@@ -39,11 +39,11 @@ func databaseConnection() string {
 
 func Router(e *echo.Echo, l *log.Logger) {
 
-	dbConn := mysql.Init(databaseConnection())
+	dbConn := db.Init(databaseConnection())
 
 	//Global Middlewares
 	cors := middlewares.InitMiddleware()
-	txMiddleware := mysql.TransactionHandler(dbConn)
+	txMiddleware := db.TransactionHandler(dbConn)
 	e.Use(cors.CORS)
 
 	//Repo Definition
