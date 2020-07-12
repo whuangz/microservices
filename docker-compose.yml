@@ -1,38 +1,40 @@
 version: "3.4"
 services:
-  product-api:
-    container_name: product_api 
-    image: whuangz/product-api:latest
+  member-api:
+    container_name: member_api 
+    image: whuangz/member-api:latest
     build: 
-      context: product-api
+      context: member-api
       target: dev
       dockerfile: Dockerfile
     ports:
       - 8080:8080
     volumes:
-      - ./product-api:/product-api
-  
-  blog-api:
-    container_name: blog_api 
-    image: whuangz/blog-api:latest
-    build: 
-      context: blog-api
-      target: dev
-      dockerfile: Dockerfile
-    ports:
-      - 9090:9090
-    volumes:
-      - ./blog-api:/blog-api
+      - ./member-api:/member-api
     depends_on:
       - db
+  
+  # blog-api:
+  #   container_name: blog_api 
+  #   image: whuangz/blog-api:latest
+  #   build: 
+  #     context: blog-api
+  #     target: dev
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 9090:9090
+  #   volumes:
+  #     - ./blog-api:/blog-api
+  #   depends_on:
+  #     - db
 
   db:
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: articles
       MYSQL_USER: notSuperUser
       MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: articles
     ports:
       - "3306:3306"
     volumes:

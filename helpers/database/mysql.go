@@ -1,21 +1,20 @@
 package mysql
 
 import (
-	"database/sql"
-
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 
 	"github.com/sirupsen/logrus"
 )
 
-func Init(dataSource string) *sql.DB {
+func Init(dataSource string) *sqlx.DB {
 	client := Connect(dataSource)
 	return client
 }
 
-func Connect(dataSource string) *sql.DB {
-	conn, err := sql.Open("mysql", dataSource)
+func Connect(dataSource string) *sqlx.DB {
+	conn, err := sqlx.Connect("mysql", dataSource)
 
 	if err != nil {
 		logrus.Error(err)
@@ -28,7 +27,7 @@ func Connect(dataSource string) *sql.DB {
 // Transactional
 const TxKey = "Tx"
 
-func TransactionHandler(db *sql.DB) echo.MiddlewareFunc {
+func TransactionHandler(db *sqlx.DB) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			tx, _ := db.Begin()
